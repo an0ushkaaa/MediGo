@@ -1,0 +1,12 @@
+Name: Anoushka
+Email: anounelson@gmail.com
+Phone: 9892113453
+Date/Time: 2025-04-25T13:20
+Symptoms: fever,cough
+------------------
+Name: Anoushka
+Email: anounelson@gmail.com
+Phone: 9892113453
+Date/Time: 2025-04-25T13:20
+Symptoms: fever,cough
+------------------

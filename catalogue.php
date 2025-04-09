@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+// Sample product data
 $products = [
     1 => ["name" => "Paracetamol", "price" => 41, "image" => "https://assets.sayacare.in/api/images/product_image/large_image/23/74/paracetamol-500-mg-10-tablet-23_1.webp"],
     2 => ["name" => "Aspirin", "price" => 58, "image" => "https://5.imimg.com/data5/SELLER/Default/2023/7/330506870/UM/GZ/QO/135658020/aspirin-dispersible-tablets.jpg"],
@@ -15,80 +16,239 @@ $products = [
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catalogue</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f8f8f8;
-        }
-        h2 {
-            text-align: center;
-        }
-        .catalogue {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-            padding: 20px;
-        }
-        .product {
-            background-color: white;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
-        .product img {
-            max-width: 100%;
-            border-radius: 8px;
-            height: 150px;
-            object-fit: cover;
-        }
-        .product button {
-            background-color: navy;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .product button:hover {
-            background-color: darkblue;
-        }
-        .nav-links {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .nav-links a {
-            margin: 0 10px;
-            text-decoration: none;
-            color: navy;
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Catalogue - MediGo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #fdfdfd;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 200px;
+      background-color: #f2f2f2;
+      padding: 20px;
+      border-right: 1px solid #ddd;
+      transition: transform 0.3s ease;
+    }
+    .sidebar.hidden {
+      transform: translateX(-100%);
+      position: absolute;
+      z-index: 10;
+    }
+    .sidebar h2 {
+      margin-bottom: 20px;
+      font-size: 22px;
+      cursor: pointer;
+    }
+    .sidebar a {
+      display: block;
+      margin: 10px 0;
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+    }
+
+    .main-content {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 30px;
+      border-bottom: 1px solid #ddd;
+      background-color: #fff;
+    }
+
+    .top-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .logo img {
+      height: 30px;
+    }
+
+    .logo span {
+      font-size: 24px;
+      font-weight: 600;
+      color: #004080;
+    }
+
+    .topnav-links {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .topnav-links a {
+      text-decoration: none;
+      color: #004080;
+      font-weight: bold;
+    }
+
+    .topnav-links button {
+      padding: 5px 10px;
+      border: none;
+      background-color: #004080;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .catalogue-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 30px 60px 10px;
+    }
+
+    .catalogue-header h2 {
+      font-size: 28px;
+      color: #004080;
+    }
+
+    .catalogue-header a {
+      text-decoration: none;
+      font-weight: bold;
+      color: #004080;
+      border: 1px solid #004080;
+      padding: 6px 12px;
+      border-radius: 6px;
+    }
+
+    .catalogue {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      padding: 20px 60px 40px;
+    }
+
+    .product {
+      background-color: white;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .product img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .product h3 {
+      margin: 10px 0 5px;
+      font-size: 18px;
+    }
+
+    .product p {
+      margin-bottom: 10px;
+      color: #333;
+      font-weight: bold;
+    }
+
+    .product button {
+      background-color: #004080;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+
+    .product button:hover {
+      background-color: #003366;
+    }
+
+    #menuToggle {
+      background-color: #004080;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-    <h2>Product Catalogue</h2>
-    <div class="nav-links">
-        <a href="index.php">Home</a>
-        <a href="cart.php">View Cart</a>
+
+  <div class="sidebar hidden" id="sidebar">
+    <h2 onclick="toggleSidebar()">Menu</h2>
+    <a href="index.php">Home</a>
+    <a href="catalogue.php">Catalogue</a>
+    <a href="upload-prescription.php">Upload Prescription</a>
+    <a href="contact.php">Contact</a>
+  </div>
+
+  <div class="main-content">
+    <div class="topbar">
+      <div class="top-left">
+        <button id="menuToggle" onclick="toggleSidebar()">Menu</button>
+        <div onclick="window.location.href='index.php'" class="logo">
+          <img src="https://cdn-icons-png.flaticon.com/512/9013/9013270.png" alt="MediGo Logo">
+          <span>MediGo</span>
+        </div>
+      </div>
+      <div class="topnav-links">
+        <?php if (isset($_SESSION['user_id'])): ?>
+          <span><?php echo htmlspecialchars($_SESSION['name'] ?? $_SESSION['email'] ?? 'User'); ?></span>
+          <a href="logout.php">Logout</a>
+        <?php else: ?>
+          <a href="sign-in.html">Login</a>
+        <?php endif; ?>
+      </div>
     </div>
+
+    <div class="catalogue-header">
+      <h2>Product Catalogue</h2>
+      <a href="cart.php">View Cart</a>
+    </div>
+
     <div class="catalogue">
-        <?php foreach ($products as $id => $product): ?>
-            <div class="product">
-                <img src="<?php echo $product['image']; ?>" alt="<?php echo $product['name']; ?>">
-                <h3><?php echo $product['name']; ?></h3>
-                <p>₹<?php echo $product['price']; ?></p>
-                <form action="cart_handler.php" method="post">
-                    <input type="hidden" name="product_id" value="<?php echo $id; ?>">
-                    <input type="hidden" name="action" value="add">
-                    <button type="submit">Add to Cart</button>
-                </form>
-            </div>
-        <?php endforeach; ?>
+      <?php foreach ($products as $id => $product): ?>
+        <div class="product">
+          <img src="<?php echo $product['image']; ?>" alt="<?php echo $product['name']; ?>">
+          <h3><?php echo $product['name']; ?></h3>
+          <p>₹<?php echo $product['price']; ?></p>
+          <form action="cart_handler.php" method="post">
+            <input type="hidden" name="product_id" value="<?php echo $id; ?>">
+            <input type="hidden" name="action" value="add">
+            <button type="submit">Add to Cart</button>
+          </form>
+        </div>
+      <?php endforeach; ?>
     </div>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('hidden');
+    }
+  </script>
 </body>
 </html>

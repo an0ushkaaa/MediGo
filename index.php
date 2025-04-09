@@ -1,124 +1,263 @@
-<?php session_start(); ?>
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MediGo - Your Health, Delivered</title>
-<style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediGo - Your Health, Delivered</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #fdfdfd;
+      display: flex;
+      min-height: 100vh;
+    }
 
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #e6f2ff; 
-}
+    .sidebar {
+      width: 200px;
+      background-color: #f2f2f2;
+      padding: 20px;
+      border-right: 1px solid #ddd;
+      transition: transform 0.3s ease;
+    }
+    .sidebar.hidden {
+      transform: translateX(-100%);
+      position: absolute;
+      z-index: 10;
+    }
+    .sidebar h2 {
+      margin-bottom: 20px;
+      font-size: 22px;
+      cursor: pointer;
+    }
+    .sidebar a {
+      display: block;
+      margin: 10px 0;
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+    }
 
+    .main-content {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
 
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    background-color: #004080; 
-    color: white;
-}
-header .logo {
-    font-size: 24px;
-    font-weight: bold;
-}
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      border-bottom: 1px solid #ddd;
+      background-color: #fff;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .logo img {
+      height: 30px;
+    }
+    .logo span {
+      font-size: 24px;
+      font-weight: 600;
+      color: #004080;
+    }
+    .topnav-links {
+      display: flex;
+      align-items: center;
+    }
+    .topnav-links a {
+      margin-left: 20px;
+      text-decoration: none;
+      color: #004080;
+      font-weight: bold;
+    }
+    .topnav-links button {
+      margin-left: 20px;
+      padding: 5px 10px;
+      border: none;
+      background-color: #004080;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
 
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 40px 60px;
+      background-color: #e6f0ff;
+      flex-wrap: wrap;
+    }
+    .hero-text {
+      max-width: 50%;
+    }
+    .hero-text h1 {
+      font-size: 36px;
+      margin-bottom: 15px;
+    }
+    .hero-text p {
+      font-size: 18px;
+      margin-bottom: 25px;
+      color: #444;
+    }
+    .hero-text .cta {
+      display: flex;
+      gap: 15px;
+    }
+    .hero-text .cta a {
+      background-color: #4d94ff;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+    .hero-img img {
+      max-width: 300px;
+      height: auto;
+    }
 
-nav {
-    display: flex;
-    gap: 15px;
-}
-nav a {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-}
-nav a:hover {
-    text-decoration: underline;
-}
+    .services {
+      padding: 40px 60px;
+    }
+    .services h2 {
+      font-size: 28px;
+      margin-bottom: 30px;
+    }
+    .service-items {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .service {
+      flex: 1;
+      text-align: center;
+      min-width: 200px;
+    }
+    .service img {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 10px;
+    }
+    .service p {
+      margin-top: 10px;
+      font-weight: bold;
+    }
 
+    #menuToggle {
+      background-color: #004080;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-right: 15px;
+    }
 
-.home-page {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding: 20px;
-    justify-content: center;
-}
-
-
-.frame {
-    flex: 1;
-    min-width: 300px;
-    background-color: #cce5ff; 
-    padding: 15px;
-    border-radius: 8px;
-    text-align: center;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-}
-.frame img {
-    max-width: 100%;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    height: 200px;
-    object-fit: cover;
-}
-
-/* Footer */
-footer {
-    text-align: center;
-    padding: 10px;
-    background-color: #004080; 
-    color: white;
-    margin-top: 20px;
-}
-</style>
+    @media (max-width: 768px) {
+      .hero {
+        flex-direction: column;
+      }
+      .hero-text {
+        max-width: 100%;
+        text-align: center;
+      }
+      .hero-img {
+        margin-top: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
 
-<header>
-    <div class="logo">MediGo</div>
-    <nav>
-        <a href="index.php">Home</a>
-        <a href="catalogue.php">Catalogue</a>
-        <a href="upload-prescription.php">Upload Prescription</a>
-        <a href="contact.php">Contact</a>
+  <div class="sidebar hidden" id="sidebar">
+    <h2 onclick="toggleSidebar()">Menu</h2>
+    <a href="about.php">About Us</a>
+    <a href="index.php">Home</a>
+    <a href="catalogue.php">Catalogue</a>
+    <a href="upload-prescription.php">Upload Prescription</a>
+    <a href="consultation.php">Online Consultation</a>
+    <a href="contact.php">Contact us</a>
+  </div>
+
+  <div class="main-content">
+
+    <div class="topbar">
+      <div style="display: flex; align-items: center;">
+        <button id="menuToggle" onclick="toggleSidebar()">☰</button>
+        <div onclick="window.location.href='index.php'" class="logo">
+          <img src="https://cdn-icons-png.flaticon.com/512/9013/9013270.png" alt="MediGo Logo">
+          <span>MediGo</span>
+        </div>
+      </div>
+      <div class="topnav-links">
         <?php if (isset($_SESSION['user_id'])): ?>
-            <span><?php echo isset($_SESSION['email']) ? htmlspecialchars($_SESSION['email']) : 'User'; ?></span>
-            <a href="logout.php">Logout</a>
+          <span>Hello, <?php echo htmlspecialchars($_SESSION['name'] ?? 'User'); ?></span>
+          <a href="logout.php">Logout</a>
         <?php else: ?>
-            <a href="sign-in.html">Login</a>
-            <a href="sign-up.html">Sign Up</a>
+          <a href="sign-in.php">Login</a>
+          <a href="sign-up.php">Sign Up</a>
         <?php endif; ?>
-    </nav>
-</header>
-
-<div class="home-page">
-    <div class="frame">
-        <img src="https://img.freepik.com/free-photo/minimalistic-science-banner-with-pills_23-2149431123.jpg" alt="Medicine">
-        <h2><a href="about.php">About Us</a></h2>
-        <p>We provide top-quality medicines and healthcare products, delivered to your doorstep.</p>
+      </div>
     </div>
-    <div class="frame">
-        <img src="https://www.shutterstock.com/image-vector/stethoscope-heartbeat-flat-icons-medicine-260nw-1009269724.jpg" alt="Medicines">
-        <h2><a href="services.php">Our Services</a></h2>
-        <p>Explore our range of medical services, including prescription delivery and online consultations.</p>
-    </div>
-    <div class="frame">
-        <img src="https://plus.unsplash.com/premium_photo-1658506671316-0b293df7c72b?w=500&auto=format&fit=crop" alt="Doctor">
-        <h2><a href="contact.php">Contact Us</a></h2>
-        <p>Have questions? Get in touch with our support team for assistance.</p>
-    </div>
-</div>
 
-<footer>
-    <p>&copy; 2025 MediGo. All Rights Reserved.</p>
-</footer>
+    <div class="hero">
+      <div class="hero-text">
+        <h1>Your Health, Delivered</h1>
+        <p>Bringing quality healthcare to your doorstep with ease and care.</p>
+        <div class="cta">
+          <a href="upload-prescription.php">Upload Prescription</a>
+          <a href="catalogue.php">View Catalogue</a>
+        </div>
+      </div>
+      <div class="hero-img">
+        <img src="https://cdn-icons-png.flaticon.com/512/4207/4207231.png" alt="Doctor Illustration">
+      </div>
+    </div>
 
+    <div class="services">
+      <h2>Our Services</h2>
+      <div class="service-items">
+        <div class="service">
+          <img src="https://cdn-icons-png.flaticon.com/512/3062/3062634.png" alt="Prescription Delivery">
+          <p>Prescription Delivery</p>
+        </div>
+        <div class="service">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Online Consultation">
+          <p>Online Consultation</p>
+        </div>
+        <div class="service">
+          <img src="https://cdn-icons-png.flaticon.com/512/2947/2947909.png" alt="Health Products">
+          <p>Health Products</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('hidden');
+    }
+  </script>
 </body>
 </html>

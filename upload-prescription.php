@@ -1,12 +1,43 @@
 <?php
 session_start();
-$cart = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
+$uploadMessage = '';
+
+$mysqli = new mysqli("localhost", "root", "", "medigo");
+if ($mysqli->connect_error) {
+    die("Connection failed: " . $mysqli->connect_error);
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $targetDir = "prescriptions/";
+    $fileName = basename($_FILES["prescription"]["name"]);
+    $uniqueFileName = time() . "_" . $fileName;
+    $targetFile = $targetDir . $uniqueFileName;
+    $fileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+
+    $allowedTypes = ['jpg', 'jpeg', 'png', 'pdf'];
+    if (in_array($fileType, $allowedTypes)) {
+        if (move_uploaded_file($_FILES["prescription"]["tmp_name"], $targetFile)) {
+            // Store filename and username into database
+            $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest';
+            $stmt = $mysqli->prepare("INSERT INTO prescriptions (username, filename, uploaded_at) VALUES (?, ?, NOW())");
+            $stmt->bind_param("ss", $username, $uniqueFileName);
+            $stmt->execute();
+            $stmt->close();
+
+            $uploadMessage = "Prescription uploaded successfully!";
+        } else {
+            $uploadMessage = "Sorry, there was an error uploading your file.";
+        }
+    } else {
+        $uploadMessage = "Only JPG, JPEG, PNG, and PDF files are allowed.";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>MediGo - Cart</title>
+    <title>Upload Prescription - MediGo</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
         body {
@@ -70,60 +101,42 @@ $cart = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
             margin-bottom: 20px;
             color: #333;
         }
-        .cart-box {
+        .form-box {
             background-color: #fff;
-            padding: 24px;
+            padding: 32px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            max-width: 700px;
+            max-width: 600px;
         }
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #eee;
-            padding: 12px 0;
+        form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
         }
-        .cart-item:last-child {
-            border-bottom: none;
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
         }
-        .cart-item span {
-            font-size: 16px;
-        }
-        .cart-item button {
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        .cart-item button:hover {
-            background-color: #c0392b;
-        }
-        .checkout-btn {
+        input[type="submit"] {
             background-color: navy;
             color: white;
             padding: 10px 18px;
             border: none;
             border-radius: 6px;
-            margin-top: 20px;
             cursor: pointer;
             font-weight: 500;
         }
-        .checkout-btn:hover {
+        input[type="submit"]:hover {
             background-color: #001f4d;
         }
-        .empty-cart {
-            color: #777;
-            font-size: 18px;
-            padding: 20px 0;
-        }
-        .total {
-            font-weight: bold;
+        .message {
             margin-top: 20px;
-            font-size: 18px;
-            color: #222;
+            font-weight: 600;
+            color: green;
+        }
+        .error {
+            color: red;
         }
     </style>
 </head>
@@ -144,38 +157,22 @@ $cart = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
         <div class="sidebar">
             <a href="index.php">Home</a>
             <a href="catalogue.php">Catalogue</a>
-            <a href="upload.php">Upload Prescription</a>
+            <a href="upload-prescription.php" class="active">Upload Prescription</a>
+            <a href="cart.php">Cart</a>
             <a href="consultation.php">Online Consultation</a>
-            <a href="cart.php" class="active">Cart</a>
             <a href="contact.php">Contact</a>
         </div>
 
         <div class="main">
-            <h2>Your Cart</h2>
-            <div class="cart-box">
-                <?php if (empty($cart)): ?>
-                    <p class="empty-cart">Your cart is empty.</p>
-                <?php else: ?>
-                    <?php
-                        $total = 0;
-                        foreach ($cart as $item) {
-                            $total += $item['price'] * $item['quantity'];
-                        }
-                    ?>
-                    <?php foreach ($cart as $id => $item): ?>
-                        <div class="cart-item">
-                            <span><?php echo $item['name']; ?> - ₹<?php echo $item['price']; ?> × <?php echo $item['quantity']; ?></span>
-                            <form action="cart_handler.php" method="post">
-                                <input type="hidden" name="product_id" value="<?php echo $id; ?>">
-                                <input type="hidden" name="action" value="remove">
-                                <button type="submit">Remove</button>
-                            </form>
-                        </div>
-                    <?php endforeach; ?>
-                    <p class="total">Total: ₹<?php echo $total; ?></p>
-                    <form action="checkout.php" method="post">
-                        <button type="submit" class="checkout-btn">Proceed to Checkout</button>
-                    </form>
+            <h2>Upload Your Prescription</h2>
+            <div class="form-box">
+                <form action="upload-prescription.php" method="POST" enctype="multipart/form-data">
+                    <label for="prescription">Choose a prescription file:</label>
+                    <input type="file" name="prescription" required>
+                    <input type="submit" value="Upload">
+                </form>
+                <?php if ($uploadMessage): ?>
+                    <div class="message"><?php echo htmlspecialchars($uploadMessage); ?></div>
                 <?php endif; ?>
             </div>
         </div>
