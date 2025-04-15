@@ -22,6 +22,46 @@ session_start();
       min-height: 100vh;
     }
 
+    /* NOTIFICATION STYLES */
+    #notification-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      max-width: 350px;
+    }
+    .notification {
+      padding: 16px;
+      margin-bottom: 15px;
+      color: white;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      animation: slideIn 0.5s, fadeOut 0.5s 4.5s forwards;
+    }
+    .notification.success {
+      background-color: #4CAF50;
+    }
+    .notification.error {
+      background-color: #f44336;
+    }
+    .close-btn {
+      margin-left: 15px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    @keyframes slideIn {
+      from {transform: translateX(100%);}
+      to {transform: translateX(0);}
+    }
+    @keyframes fadeOut {
+      from {opacity: 1;}
+      to {opacity: 0;}
+    }
+
     .sidebar {
       width: 200px;
       background-color: #f2f2f2;
@@ -183,10 +223,31 @@ session_start();
       .hero-img {
         margin-top: 20px;
       }
+      #notification-container {
+        left: 20px;
+        right: 20px;
+        max-width: none;
+      }
     }
   </style>
 </head>
 <body>
+
+  <!-- Notification Container -->
+  <div id="notification-container">
+    <?php if (isset($_SESSION['order_success'])): ?>
+    <div class="notification success" id="order-notification">
+      <div style="display: flex; align-items: center;">
+        <span style="margin-right: 10px; font-size: 1.2em;">✓</span>
+        <div>
+          <strong>Order Confirmed!</strong><br>
+          #<?= $_SESSION['order_success']['order_id'] ?> • ₹<?= $_SESSION['order_success']['total'] ?>
+        </div>
+      </div>
+      <span class="close-btn" onclick="dismissNotification()">×</span>
+    </div>
+    <?php unset($_SESSION['order_success']); endif; ?>
+  </div>
 
   <div class="sidebar hidden" id="sidebar">
     <h2 onclick="toggleSidebar()">Menu</h2>
@@ -258,6 +319,18 @@ session_start();
       const sidebar = document.getElementById('sidebar');
       sidebar.classList.toggle('hidden');
     }
+
+    // Notification functions
+    function dismissNotification() {
+      const notification = document.getElementById('order-notification');
+      if (notification) notification.style.display = 'none';
+    }
+
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+      const notification = document.getElementById('order-notification');
+      if (notification) notification.style.display = 'none';
+    }, 5000);
   </script>
 </body>
 </html>

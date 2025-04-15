@@ -1,7 +1,11 @@
 <?php
-session_start();
+session_start();  // Ensure session is started at the very top of the page
 $uploadMessage = '';
 
+// Check if the session variable 'username' exists, and if not, set it to 'Guest'
+$username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest';
+
+// Connect to the database
 $mysqli = new mysqli("localhost", "root", "", "medigo");
 if ($mysqli->connect_error) {
     die("Connection failed: " . $mysqli->connect_error);
@@ -18,7 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (in_array($fileType, $allowedTypes)) {
         if (move_uploaded_file($_FILES["prescription"]["tmp_name"], $targetFile)) {
             // Store filename and username into database
-            $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest';
             $stmt = $mysqli->prepare("INSERT INTO prescriptions (username, filename, uploaded_at) VALUES (?, ?, NOW())");
             $stmt->bind_param("ss", $username, $uniqueFileName);
             $stmt->execute();
@@ -33,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -61,12 +65,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             font-size: 20px;
             font-weight: 600;
             color: navy;
-        }
-        .topbar .auth-links a {
-            text-decoration: none;
-            color: navy;
-            margin-left: 16px;
-            font-weight: 500;
         }
         .container {
             display: flex;
@@ -143,14 +141,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body>
     <div class="topbar">
         <h1>MediGo</h1>
-        <div class="auth-links">
-            <?php if (isset($_SESSION['username'])): ?>
-                <span>Welcome, <?php echo $_SESSION['username']; ?></span>
-                <a href="logout.php">Logout</a>
-            <?php else: ?>
-                <a href="login.php">Login</a>
-            <?php endif; ?>
-        </div>
     </div>
 
     <div class="container">

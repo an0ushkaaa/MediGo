@@ -1,31 +1,33 @@
 <?php
 session_start();
-
-
-$products = [
-    1 => ["name" => "Paracetamol", "price" => 5],
-    2 => ["name" => "Aspirin", "price" => 7],
-    3 => ["name" => "Amoxicillin", "price" => 10],
-    4 => ["name" => "Ibuprofen", "price" => 8]
-];
+require 'db_connect.php'; // Make sure this file exists with your DB connection
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $product_id = $_POST['product_id'];
+    $product_id = (int)$_POST['product_id'];
     $action = $_POST['action'];
 
-    
+    // Initialize cart if not exists
     if (!isset($_SESSION['cart'])) {
         $_SESSION['cart'] = [];
     }
 
     switch ($action) {
         case 'add':
-            if (isset($products[$product_id])) {
+            // Get current product data from database
+            $stmt = $conn->prepare("SELECT product_id, name, price FROM products WHERE product_id = ?");
+            $stmt->bind_param("i", $product_id);
+            $stmt->execute();
+            $product = $stmt->get_result()->fetch_assoc();
+
+            if ($product) {
                 if (isset($_SESSION['cart'][$product_id])) {
                     $_SESSION['cart'][$product_id]['quantity'] += 1;
                 } else {
-                    $_SESSION['cart'][$product_id] = $products[$product_id];
-                    $_SESSION['cart'][$product_id]['quantity'] = 1;
+                    $_SESSION['cart'][$product_id] = [
+                        'name' => $product['name'],
+                        'price' => $product['price'],
+                        'quantity' => 1
+                    ];
                 }
             }
             break;

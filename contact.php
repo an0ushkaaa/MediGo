@@ -1,5 +1,8 @@
 <?php
 session_start();
+$status = $_SESSION['contact_status'] ?? null;
+$form_data = $_SESSION['form_data'] ?? [];
+unset($_SESSION['contact_status'], $_SESSION['form_data']);
 ?>
 
 <!DOCTYPE html>
@@ -158,14 +161,53 @@ session_start();
       margin-right: 15px;
     }
 
+    /* NEW ALERT STYLES */
+    .success-alert {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 4px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      z-index: 1000;
+      animation: fadeInOut 3s ease-in-out;
+      opacity: 0;
+    }
+    @keyframes fadeInOut {
+      0% { opacity: 0; top: 10px; }
+      10% { opacity: 1; top: 20px; }
+      90% { opacity: 1; top: 20px; }
+      100% { opacity: 0; top: 10px; }
+    }
+
     @media (max-width: 768px) {
       .contact-section {
         padding: 30px;
+      }
+      .success-alert {
+        width: 90%;
+        text-align: center;
       }
     }
   </style>
 </head>
 <body>
+
+  <!-- Success Alert (added) -->
+  <?php if ($status && $status['type'] === 'success'): ?>
+  <div class="success-alert" id="successAlert">
+    Message sent successfully!
+  </div>
+  <script>
+    setTimeout(() => {
+      const alert = document.getElementById('successAlert');
+      if (alert) alert.remove();
+    }, 3000);
+  </script>
+  <?php endif; ?>
 
   <div class="sidebar hidden" id="sidebar">
     <h2 onclick="toggleSidebar()">Menu</h2>
@@ -200,10 +242,14 @@ session_start();
     <div class="contact-section">
       <div class="contact-container">
         <h2>Contact Us</h2>
-        <form action="contact-handler.php" method="POST">
-          <input type="text" name="name" placeholder="Your Name" required>
-          <input type="email" name="email" placeholder="Your Email" required>
-          <textarea name="message" rows="6" placeholder="Your Message" required></textarea>
+        <form action="contact_handler.php" method="POST">
+          <input type="text" name="name" placeholder="Your Name" required
+                 value="<?= htmlspecialchars($form_data['name'] ?? '') ?>">
+          <input type="email" name="email" placeholder="Your Email" required
+                 value="<?= htmlspecialchars($form_data['email'] ?? '') ?>">
+          <textarea name="message" rows="6" placeholder="Your Message" required><?= 
+              htmlspecialchars($form_data['message'] ?? '') 
+          ?></textarea>
           <button type="submit">Send Message</button>
         </form>
       </div>
