@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Sample product data
+
 $products = [
     1 => ["name" => "Paracetamol", "price" => 41, "image" => "https://assets.sayacare.in/api/images/product_image/large_image/23/74/paracetamol-500-mg-10-tablet-23_1.webp"],
     2 => ["name" => "Aspirin", "price" => 58, "image" => "https://5.imimg.com/data5/SELLER/Default/2023/7/330506870/UM/GZ/QO/135658020/aspirin-dispersible-tablets.jpg"],
@@ -120,11 +120,20 @@ $products = [
       justify-content: space-between;
       align-items: center;
       margin: 30px 60px 10px;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
     .catalogue-header h2 {
       font-size: 28px;
       color: #004080;
+    }
+
+    .catalogue-header input {
+      padding: 8px;
+      width: 250px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
     }
 
     .catalogue-header a {
@@ -138,9 +147,10 @@ $products = [
 
     .catalogue {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       gap: 20px;
       padding: 20px 60px 40px;
+      align-items: start;
     }
 
     .product {
@@ -149,6 +159,8 @@ $products = [
       border-radius: 10px;
       text-align: center;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
     }
 
     .product img {
@@ -225,12 +237,13 @@ $products = [
 
     <div class="catalogue-header">
       <h2>Product Catalogue</h2>
+      <input type="text" id="searchInput" placeholder="Search medicines...">
       <a href="cart.php">View Cart</a>
     </div>
 
-    <div class="catalogue">
+    <div class="catalogue" id="productGrid">
       <?php foreach ($products as $id => $product): ?>
-        <div class="product">
+        <div class="product" data-name="<?php echo strtolower($product['name']); ?>">
           <img src="<?php echo $product['image']; ?>" alt="<?php echo $product['name']; ?>">
           <h3><?php echo $product['name']; ?></h3>
           <p>₹<?php echo $product['price']; ?></p>
@@ -249,6 +262,21 @@ $products = [
       const sidebar = document.getElementById('sidebar');
       sidebar.classList.toggle('hidden');
     }
+
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('keyup', function () {
+      const searchValue = this.value.toLowerCase();
+      const products = document.querySelectorAll('.product');
+
+      products.forEach(product => {
+        const name = product.getAttribute('data-name');
+        if (name.includes(searchValue)) {
+          product.style.display = "flex";
+        } else {
+          product.style.display = "none";
+        }
+      });
+    });
   </script>
 </body>
 </html>
