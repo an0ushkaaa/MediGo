@@ -16,7 +16,7 @@ MediGo is a web-based medicine shopping platform where users can sign up, browse
 
 ---
 
-## 🛠 Tech Stack
+##  Tech Stack
 
 - **Frontend**: HTML, CSS
 - **Backend**: PHP
