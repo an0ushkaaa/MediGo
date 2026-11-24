@@ -1,6 +1,6 @@
 # MediGo 
 
-MediGo is a web-based medicine shopping platform where users can sign up, browse medicines, manage a shopping cart, upload prescriptions, and request consultations. Built using PHP and MySQL, it's a simple simulation of an online pharmacy.
+MediGo is a web-based medicine shopping platform where users can sign up, browse medicines, manage a shopping cart, upload prescriptions, and request consultations. Built using PHP and MySQL, it's a simple simulation of an online pharmacy
 
 ---
 
@@ -21,4 +21,3 @@ MediGo is a web-based medicine shopping platform where users can sign up, browse
 - **Frontend**: HTML, CSS
 - **Backend**: PHP
 - **Database**: MySQL
-
